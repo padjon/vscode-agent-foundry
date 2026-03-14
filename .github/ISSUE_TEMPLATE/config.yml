@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Product wishes or private questions
+    url: mailto:info@devsheep.de
+    about: Email product wishes, private questions, or sensitive concerns here.

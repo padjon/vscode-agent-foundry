@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0
+
+- Added safer bootstrap preview flow before writing generated workflow files
+- Added stack-aware instruction generation for Next.js, Python, and monorepo repositories
+- Added built-in getting-started walkthrough and marketplace media assets
+- Added README marketplace CTA, sponsor links, and explicit feedback channels
+- Added packaging and release workflow with `vsce --no-dependencies`
+- Added repo maturity assets including issue templates, contribution guidance, security policy, and release notes
+
 ## 0.1.0
 
 - Initial release of Agent Foundry

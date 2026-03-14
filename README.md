@@ -82,6 +82,13 @@ The repository now includes:
 - built-in walkthrough steps with local media assets
 - `RELEASE_CHECKLIST.md` for packaging and publishing
 
+## Feedback And Support
+
+- Issues and product wishes: https://github.com/padjon/vscode-agent-foundry/issues
+- Email: info@devsheep.de
+- Contributing guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security reporting: [SECURITY.md](SECURITY.md)
+
 ## Quality Notes
 
 - verification command suggestions now adapt to `npm`, `pnpm`, `yarn`, and `bun`

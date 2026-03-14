@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest a product improvement or workflow wish
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for sharing a product wish.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Workflow gap
+      description: What is painful or missing today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: What should Agent Foundry do?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Repository shape or stack
+      description: Tell us whether this is about a monorepo, Next.js app, Python service, or another setup

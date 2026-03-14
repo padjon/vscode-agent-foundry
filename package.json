@@ -2,7 +2,7 @@
   "name": "vscode-agent-foundry",
   "displayName": "Agent Foundry",
   "description": "Bootstrap any repository for agentic software engineering with portable instructions, custom agents, reusable skills, and task handoffs.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "padjon",
   "author": "Patrick Schäfer",
   "icon": "assets/icon.png",
@@ -221,6 +221,11 @@
           "type": "boolean",
           "default": true,
           "description": "Ask for confirmation before overwriting existing generated workflow files."
+        },
+        "agentFoundry.previewBeforeWrite": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a generated-file preview before Agent Foundry writes workflow assets into the repository."
         }
       }
     }
