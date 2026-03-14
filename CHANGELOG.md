@@ -10,3 +10,4 @@
 - Added prompt and instruction file generation for official VS Code customization paths
 - Added overwrite confirmation before regenerating workflow files
 - Added package-manager-aware verification command suggestions and unit tests
+- Added npm packaging workflow with `vsce --no-dependencies`

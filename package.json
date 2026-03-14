@@ -45,8 +45,8 @@
   "scripts": {
     "verify": "node --check extension.js && node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json ok')\"",
     "test": "node --test",
-    "package": "npx @vscode/vsce package",
-    "prepublishOnly": "npm run verify"
+    "package": "npx @vscode/vsce package --no-dependencies",
+    "prepublishOnly": "npm run verify && npm test"
   },
   "devDependencies": {
     "@vscode/vsce": "^3.7.1"

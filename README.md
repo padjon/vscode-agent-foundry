@@ -65,6 +65,7 @@ The repository now includes:
 - `.vscodeignore` for packaging hygiene
 - `npm run verify` for a minimal manifest and syntax check
 - `npm test` for core helper regression coverage
+- `npm run package` for `.vsix` generation
 - `RELEASE_CHECKLIST.md` for packaging and publishing
 
 ## Quality Notes
@@ -72,6 +73,7 @@ The repository now includes:
 - verification command suggestions now adapt to `npm`, `pnpm`, `yarn`, and `bun`
 - bootstrap warns before overwriting existing workflow files
 - core helper logic has a lightweight built-in test suite
+- packaging uses `vsce --no-dependencies` because the extension ships without runtime dependencies
 
 ## Recommended Repository Name
 
