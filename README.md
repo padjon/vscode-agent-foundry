@@ -1,8 +1,12 @@
 # Agent Foundry
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/padjon)
+
 `Agent Foundry` is a VS Code extension for the current agentic-software-engineering wave: instead of trying to be yet another coding agent, it turns any repository into an agent-ready workspace.
 
 It analyzes the repo, generates portable workflow assets, and creates task handoffs that can move across GitHub Copilot, Claude, Codex, Cline, Roo, and similar tools.
+
+If Agent Foundry is useful in your team or open-source workflow, support ongoing development through [GitHub Sponsors](https://github.com/sponsors/padjon).
 
 ## Why This Direction
 
