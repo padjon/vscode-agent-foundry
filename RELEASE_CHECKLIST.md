@@ -6,6 +6,7 @@
 - Review `README.md` screenshots and marketplace copy
 - Verify repository, bugs, sponsor, and homepage metadata
 - Run `npm run verify`
+- Run `npm test`
 - Test `Agent Foundry: Analyze Workspace`
 - Test `Agent Foundry: Bootstrap Agent Workflow Assets`
 - Test `Agent Foundry: Generate Task Handoff`

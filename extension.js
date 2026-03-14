@@ -301,7 +301,7 @@ async function analyzeWorkspace(folder) {
   const has = (relativePath) => fs.existsSync(path.join(rootPath, relativePath));
   const techStack = detectTechStack(rootPath, packageJson, allDependencies);
   const packageManager = detectPackageManager(rootPath);
-  const verificationCommands = detectVerificationCommands(packageScripts);
+  const verificationCommands = detectVerificationCommands(packageScripts, packageManager);
   const diagnostics = collectDiagnostics(rootPath);
   const git = await getGitSummary(rootPath);
   const existingAssets = await detectExistingAssets(rootPath);
@@ -426,7 +426,8 @@ function detectPackageManager(rootPath) {
   return 'unknown';
 }
 
-function detectVerificationCommands(scripts) {
+function detectVerificationCommands(scripts, packageManager) {
+  const runner = getScriptRunner(packageManager);
   const candidates = [];
   const add = (value) => {
     if (value && !candidates.includes(value)) {
@@ -435,28 +436,51 @@ function detectVerificationCommands(scripts) {
   };
 
   if (scripts.lint) {
-    add('npm run lint');
+    add(formatScriptCommand(runner, 'lint'));
   }
   if (scripts.typecheck) {
-    add('npm run typecheck');
+    add(formatScriptCommand(runner, 'typecheck'));
   }
   if (scripts.test) {
-    add('npm run test');
+    add(formatScriptCommand(runner, 'test'));
   }
   if (scripts.build) {
-    add('npm run build');
+    add(formatScriptCommand(runner, 'build'));
   }
   if (scripts['test:unit']) {
-    add('npm run test:unit');
+    add(formatScriptCommand(runner, 'test:unit'));
   }
   if (scripts['test:integration']) {
-    add('npm run test:integration');
+    add(formatScriptCommand(runner, 'test:integration'));
   }
   if (scripts['test:e2e']) {
-    add('npm run test:e2e');
+    add(formatScriptCommand(runner, 'test:e2e'));
   }
 
   return candidates;
+}
+
+function getScriptRunner(packageManager) {
+  if (packageManager === 'pnpm') {
+    return 'pnpm';
+  }
+  if (packageManager === 'yarn') {
+    return 'yarn';
+  }
+  if (packageManager === 'bun') {
+    return 'bun';
+  }
+  return 'npm';
+}
+
+function formatScriptCommand(runner, scriptName) {
+  if (runner === 'yarn' || runner === 'pnpm') {
+    return `${runner} ${scriptName}`;
+  }
+  if (runner === 'bun') {
+    return `bun run ${scriptName}`;
+  }
+  return `npm run ${scriptName}`;
 }
 
 function collectDiagnostics(rootPath) {
@@ -1316,5 +1340,14 @@ function refreshWorkspaceContext() {
 
 module.exports = {
   activate,
-  deactivate
+  deactivate,
+  __testUtils: {
+    detectVerificationCommands,
+    getScriptRunner,
+    formatScriptCommand,
+    detectPackageManager,
+    slugify,
+    formatDateStamp,
+    computeReadinessScore
+  }
 };

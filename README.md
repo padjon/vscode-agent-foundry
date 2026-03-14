@@ -64,7 +64,14 @@ The repository now includes:
 - `.vscode/launch.json` for an Extension Development Host
 - `.vscodeignore` for packaging hygiene
 - `npm run verify` for a minimal manifest and syntax check
+- `npm test` for core helper regression coverage
 - `RELEASE_CHECKLIST.md` for packaging and publishing
+
+## Quality Notes
+
+- verification command suggestions now adapt to `npm`, `pnpm`, `yarn`, and `bun`
+- bootstrap warns before overwriting existing workflow files
+- core helper logic has a lightweight built-in test suite
 
 ## Recommended Repository Name
 
