@@ -9,6 +9,8 @@ It analyzes the repo, generates portable workflow assets, and creates task hando
 
 If Agent Foundry is useful in your team or open-source workflow, support ongoing development through [GitHub Sponsors](https://github.com/sponsors/padjon).
 
+If you hit issues or have product wishes, please tell us on [GitHub Issues](https://github.com/padjon/vscode-agent-foundry/issues) or by mail at [info@devsheep.de](mailto:info@devsheep.de).
+
 ![Agent Foundry hero](assets/marketplace-hero.png)
 
 ## Why This Direction
