@@ -1,0 +1,170 @@
+{
+  "name": "vscode-agent-foundry",
+  "displayName": "Agent Foundry",
+  "description": "Bootstrap any repository for agentic software engineering with portable instructions, custom agents, reusable skills, and task handoffs.",
+  "version": "0.1.0",
+  "publisher": "padjon",
+  "author": "Patrick Schäfer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/padjon/vscode-agent-foundry.git"
+  },
+  "homepage": "https://github.com/padjon/vscode-agent-foundry#readme",
+  "bugs": {
+    "url": "https://github.com/padjon/vscode-agent-foundry/issues"
+  },
+  "sponsor": {
+    "url": "https://github.com/sponsors/padjon"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "agentic software engineering",
+    "copilot",
+    "codex",
+    "claude",
+    "agent handoff",
+    "agents.md",
+    "claude.md",
+    "copilot instructions",
+    "custom agents",
+    "agent skills",
+    "prompt engineering",
+    "developer tools"
+  ],
+  "galleryBanner": {
+    "color": "#123b44",
+    "theme": "dark"
+  },
+  "scripts": {
+    "verify": "node --check extension.js && node -e \"JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json ok')\"",
+    "package": "npx @vscode/vsce package",
+    "prepublishOnly": "npm run verify"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.7.1"
+  },
+  "activationEvents": [
+    "onCommand:agentFoundry.analyzeWorkspace",
+    "onCommand:agentFoundry.bootstrapWorkspace",
+    "onCommand:agentFoundry.generateTaskHandoff",
+    "onCommand:agentFoundry.showActions",
+    "onCommand:agentFoundry.openResearchNotes",
+    "onView:agentFoundry.sidebar"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "agentFoundry.analyzeWorkspace",
+        "title": "Analyze Workspace",
+        "category": "Agent Foundry"
+      },
+      {
+        "command": "agentFoundry.bootstrapWorkspace",
+        "title": "Bootstrap Agent Workflow Assets",
+        "category": "Agent Foundry"
+      },
+      {
+        "command": "agentFoundry.generateTaskHandoff",
+        "title": "Generate Task Handoff",
+        "category": "Agent Foundry"
+      },
+      {
+        "command": "agentFoundry.showActions",
+        "title": "Show Actions",
+        "category": "Agent Foundry"
+      },
+      {
+        "command": "agentFoundry.openResearchNotes",
+        "title": "Open Market Research",
+        "category": "Agent Foundry"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agentFoundry",
+          "title": "Foundry",
+          "icon": "resources/foundry.svg"
+        }
+      ]
+    },
+    "views": {
+      "agentFoundry": [
+        {
+          "id": "agentFoundry.sidebar",
+          "name": "Workspace"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "agentFoundry.sidebar",
+        "contents": "Open a folder or workspace to use Agent Foundry.\n[Open market research](command:agentFoundry.openResearchNotes)",
+        "when": "!agentFoundry.hasWorkspace"
+      },
+      {
+        "view": "agentFoundry.sidebar",
+        "contents": "Run an analysis, generate portable repo instructions, and create handoffs for Copilot, Claude, Codex, and other coding agents.\n[Analyze workspace](command:agentFoundry.analyzeWorkspace)\n[Bootstrap assets](command:agentFoundry.bootstrapWorkspace)\n[Generate task handoff](command:agentFoundry.generateTaskHandoff)",
+        "when": "agentFoundry.hasWorkspace"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "agentFoundry.showActions",
+          "when": "view == agentFoundry.sidebar",
+          "group": "navigation"
+        },
+        {
+          "command": "agentFoundry.bootstrapWorkspace",
+          "when": "view == agentFoundry.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "agentFoundry.analyzeWorkspace",
+          "when": "view == agentFoundry.sidebar",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Agent Foundry",
+      "properties": {
+        "agentFoundry.outputFolder": {
+          "type": "string",
+          "default": ".agent-foundry",
+          "description": "Workspace-relative folder where Agent Foundry stores reports and generated handoffs."
+        },
+        "agentFoundry.includeClaudeAssets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate Claude-compatible repo assets alongside neutral and GitHub-oriented files."
+        },
+        "agentFoundry.includeGitStatusInHandoff": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include current git status details in generated task handoffs when the workspace is a git repository."
+        },
+        "agentFoundry.maxDiagnosticsInHandoff": {
+          "type": "number",
+          "default": 12,
+          "minimum": 0,
+          "description": "Maximum number of workspace diagnostics to include in generated task handoffs."
+        },
+        "agentFoundry.promptBeforeOverwrite": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask for confirmation before overwriting existing generated workflow files."
+        }
+      }
+    }
+  }
+}

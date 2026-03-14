@@ -1,0 +1,4 @@
+/.agent-foundry/
+.DS_Store
+node_modules/
+*.vsix
