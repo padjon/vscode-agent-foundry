@@ -121,3 +121,4 @@ The research behind this direction is documented in:
 
 - [`docs/market-research.md`](docs/market-research.md)
 - [`docs/implementation-plan.md`](docs/implementation-plan.md)
+- [`docs/status-roadmap.md`](docs/status-roadmap.md)

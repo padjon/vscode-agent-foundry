@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Added a durable status and roadmap document for future continuation
+- Linked the roadmap directly from the README
+- Shipped a small stability and documentation follow-up after the 1.0.0 release
+
 ## 1.0.0
 
 - Added safer bootstrap preview flow before writing generated workflow files
