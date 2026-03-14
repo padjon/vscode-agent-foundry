@@ -130,20 +130,7 @@ async function bootstrapWorkspaceCommand(context, state, provider) {
     return;
   }
 
-  const existingOutputs = detectPotentialOverwriteTargets(folder.fsPath);
-  const shouldPrompt = getConfiguration().get('promptBeforeOverwrite', true);
-  if (shouldPrompt && existingOutputs.length) {
-    const decision = await vscode.window.showWarningMessage(
-      `Agent Foundry will overwrite ${existingOutputs.length} existing workflow file${existingOutputs.length === 1 ? '' : 's'}.`,
-      { modal: true, detail: existingOutputs.slice(0, 10).join('\n') },
-      'Overwrite',
-      'Cancel'
-    );
-
-    if (decision !== 'Overwrite') {
-      return;
-    }
-  }
+  const previewBeforeWrite = getConfiguration().get('previewBeforeWrite', true);
 
   const analysis = await vscode.window.withProgress(
     {
@@ -153,7 +140,31 @@ async function bootstrapWorkspaceCommand(context, state, provider) {
     },
     async () => {
       const nextAnalysis = await analyzeWorkspace(folder);
-      await writeWorkspaceAssets(folder, nextAnalysis);
+      const generatedFiles = buildGeneratedFiles(folder, nextAnalysis);
+      const existingOutputs = detectPotentialOverwriteTargets(folder.fsPath, generatedFiles.map((file) => file.relativePath));
+
+      if (previewBeforeWrite) {
+        const proceed = await previewGeneratedFiles(folder, nextAnalysis, generatedFiles, existingOutputs);
+        if (!proceed) {
+          return nextAnalysis;
+        }
+      }
+
+      const shouldPrompt = getConfiguration().get('promptBeforeOverwrite', true);
+      if (shouldPrompt && existingOutputs.length) {
+        const decision = await vscode.window.showWarningMessage(
+          `Agent Foundry will overwrite ${existingOutputs.length} existing workflow file${existingOutputs.length === 1 ? '' : 's'}.`,
+          { modal: true, detail: existingOutputs.slice(0, 10).join('\n') },
+          'Overwrite',
+          'Cancel'
+        );
+
+        if (decision !== 'Overwrite') {
+          return nextAnalysis;
+        }
+      }
+
+      await writeGeneratedFiles(folder, generatedFiles);
       return await analyzeWorkspace(folder);
     }
   );
@@ -699,36 +710,61 @@ function computeReadinessScore(existingAssets, verificationCommands, diagnostics
 }
 
 async function writeWorkspaceAssets(folder, analysis) {
-  const rootPath = folder.fsPath;
-  const outputFolder = path.join(rootPath, getOutputFolderName());
-  const includeClaudeAssets = getConfiguration().get('includeClaudeAssets', true);
+  const generatedFiles = buildGeneratedFiles(folder, analysis);
+  await writeGeneratedFiles(folder, generatedFiles);
+}
 
-  const writes = [
-    writeTextFile(path.join(rootPath, 'AGENTS.md'), buildAgentsMd(analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'copilot-instructions.md'), buildCopilotInstructions(analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'agents', 'planner.agent.md'), buildGithubAgent('planner', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'agents', 'implementer.agent.md'), buildGithubAgent('implementer', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'agents', 'reviewer.agent.md'), buildGithubAgent('reviewer', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'instructions', 'repository.instructions.md'), buildInstructionFile('repository', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'instructions', 'frontend.instructions.md'), buildInstructionFile('frontend', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'instructions', 'backend.instructions.md'), buildInstructionFile('backend', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'prompts', 'plan-change.prompt.md'), buildPromptFile('plan-change', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'prompts', 'ship-change.prompt.md'), buildPromptFile('ship-change', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'skills', 'bug-triage', 'SKILL.md'), buildSkill('bug-triage', analysis)),
-    writeTextFile(path.join(rootPath, '.github', 'skills', 'change-safely', 'SKILL.md'), buildSkill('change-safely', analysis)),
-    writeTextFile(path.join(outputFolder, 'workspace-analysis.md'), buildWorkspaceAnalysisMarkdown(analysis)),
-    writeTextFile(path.join(outputFolder, 'workspace-analysis.json'), JSON.stringify(buildWorkspaceAnalysisJson(analysis), null, 2)),
-    writeTextFile(path.join(outputFolder, 'implementation-plan.md'), buildImplementationPlan(analysis))
+function buildGeneratedFiles(folder, analysis) {
+  const outputFolder = getOutputFolderName();
+  const includeClaudeAssets = getConfiguration().get('includeClaudeAssets', true);
+  const files = [
+    { relativePath: 'AGENTS.md', content: buildAgentsMd(analysis) },
+    { relativePath: '.github/copilot-instructions.md', content: buildCopilotInstructions(analysis) },
+    { relativePath: '.github/agents/planner.agent.md', content: buildGithubAgent('planner', analysis) },
+    { relativePath: '.github/agents/implementer.agent.md', content: buildGithubAgent('implementer', analysis) },
+    { relativePath: '.github/agents/reviewer.agent.md', content: buildGithubAgent('reviewer', analysis) },
+    { relativePath: '.github/instructions/repository.instructions.md', content: buildInstructionFile('repository', analysis) },
+    { relativePath: '.github/instructions/frontend.instructions.md', content: buildInstructionFile('frontend', analysis) },
+    { relativePath: '.github/instructions/backend.instructions.md', content: buildInstructionFile('backend', analysis) },
+    { relativePath: '.github/prompts/plan-change.prompt.md', content: buildPromptFile('plan-change', analysis) },
+    { relativePath: '.github/prompts/ship-change.prompt.md', content: buildPromptFile('ship-change', analysis) },
+    { relativePath: '.github/skills/bug-triage/SKILL.md', content: buildSkill('bug-triage', analysis) },
+    { relativePath: '.github/skills/change-safely/SKILL.md', content: buildSkill('change-safely', analysis) },
+    { relativePath: `${outputFolder}/workspace-analysis.md`, content: buildWorkspaceAnalysisMarkdown(analysis) },
+    { relativePath: `${outputFolder}/workspace-analysis.json`, content: JSON.stringify(buildWorkspaceAnalysisJson(analysis), null, 2) },
+    { relativePath: `${outputFolder}/implementation-plan.md`, content: buildImplementationPlan(analysis) }
   ];
 
   if (includeClaudeAssets) {
-    writes.push(writeTextFile(path.join(rootPath, 'CLAUDE.md'), buildClaudeMd(analysis)));
-    writes.push(writeTextFile(path.join(rootPath, '.claude', 'agents', 'planner.md'), buildClaudeAgent('planner', analysis)));
-    writes.push(writeTextFile(path.join(rootPath, '.claude', 'agents', 'implementer.md'), buildClaudeAgent('implementer', analysis)));
-    writes.push(writeTextFile(path.join(rootPath, '.claude', 'agents', 'reviewer.md'), buildClaudeAgent('reviewer', analysis)));
+    files.push({ relativePath: 'CLAUDE.md', content: buildClaudeMd(analysis) });
+    files.push({ relativePath: '.claude/agents/planner.md', content: buildClaudeAgent('planner', analysis) });
+    files.push({ relativePath: '.claude/agents/implementer.md', content: buildClaudeAgent('implementer', analysis) });
+    files.push({ relativePath: '.claude/agents/reviewer.md', content: buildClaudeAgent('reviewer', analysis) });
   }
 
-  await Promise.all(writes);
+  return files;
+}
+
+async function writeGeneratedFiles(folder, generatedFiles) {
+  const rootPath = folder.fsPath;
+  await Promise.all(generatedFiles.map((file) => writeTextFile(path.join(rootPath, file.relativePath), file.content)));
+}
+
+async function previewGeneratedFiles(folder, analysis, generatedFiles, existingOutputs) {
+  const previewDocument = await vscode.workspace.openTextDocument({
+    language: 'markdown',
+    content: buildGenerationPreviewMarkdown(analysis, generatedFiles, existingOutputs)
+  });
+  await vscode.window.showTextDocument(previewDocument, { preview: false });
+
+  const decision = await vscode.window.showInformationMessage(
+    `Agent Foundry is ready to write ${generatedFiles.length} workflow file${generatedFiles.length === 1 ? '' : 's'}.`,
+    { modal: true, detail: 'Review the preview document, then choose whether to write the files into the repository.' },
+    'Write Files',
+    'Cancel'
+  );
+
+  return decision === 'Write Files';
 }
 
 async function writeTaskHandoff(folder, analysis, title) {
@@ -826,6 +862,37 @@ function buildImplementationPlan(analysis) {
     `- Detected stack: ${analysis.techStack.join(', ')}`,
     `- Verification anchors: ${analysis.verificationCommands.join(', ') || 'none yet'}`,
     `- Readiness baseline: ${analysis.readinessScore}/100`,
+    ''
+  ].join('\n');
+}
+
+function buildGenerationPreviewMarkdown(analysis, generatedFiles, existingOutputs) {
+  return [
+    '# Agent Foundry Preview',
+    '',
+    `Agent Foundry is about to generate ${generatedFiles.length} file${generatedFiles.length === 1 ? '' : 's'} for \`${analysis.repoName}\`.`,
+    '',
+    `- Readiness score: \`${analysis.readinessScore}/100\``,
+    `- Stack: ${analysis.techStack.join(', ')}`,
+    `- Verification commands: ${analysis.verificationCommands.join(', ') || 'none detected'}`,
+    '',
+    '## Files To Be Written',
+    '',
+    ...generatedFiles.map((file) => `- \`${file.relativePath}\` (${countLines(file.content)} lines)`),
+    '',
+    '## Existing Files That Will Be Overwritten',
+    '',
+    ...(existingOutputs.length ? existingOutputs.map((file) => `- \`${file}\``) : ['- None']),
+    '',
+    '## Generated Highlights',
+    '',
+    '- Vendor-neutral repo contract in `AGENTS.md`',
+    '- Copilot instructions plus scoped instruction and prompt files',
+    '- Planner, implementer, and reviewer custom agent roles',
+    '- Starter skills for bug triage and safe changes',
+    '- Workspace analysis and implementation plan reports under `.agent-foundry`',
+    '',
+    'Use the modal confirmation after this preview to write the files or cancel safely.',
     ''
   ].join('\n');
 }
@@ -1263,8 +1330,10 @@ function collectCurrentEditorFiles(rootPath) {
   return files;
 }
 
-function detectPotentialOverwriteTargets(rootPath) {
-  const candidates = [
+function detectPotentialOverwriteTargets(rootPath, candidates) {
+  const targetCandidates =
+    candidates ||
+    [
     'AGENTS.md',
     'CLAUDE.md',
     '.github/copilot-instructions.md',
@@ -1281,9 +1350,9 @@ function detectPotentialOverwriteTargets(rootPath) {
     `${getOutputFolderName()}/workspace-analysis.md`,
     `${getOutputFolderName()}/workspace-analysis.json`,
     `${getOutputFolderName()}/implementation-plan.md`
-  ];
+    ];
 
-  return candidates.filter((relativePath) => fs.existsSync(path.join(rootPath, relativePath)));
+  return targetCandidates.filter((relativePath) => fs.existsSync(path.join(rootPath, relativePath)));
 }
 
 async function writeTextFile(filePath, content) {
@@ -1330,6 +1399,13 @@ function slugify(value) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function countLines(value) {
+  if (!value) {
+    return 0;
+  }
+  return value.split(/\r?\n/).length;
 }
 
 function formatDateStamp(date) {

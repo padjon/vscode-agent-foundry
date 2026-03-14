@@ -85,6 +85,7 @@ The repository now includes:
 - bootstrap warns before overwriting existing workflow files
 - core helper logic has a lightweight built-in test suite
 - packaging uses `vsce --no-dependencies` because the extension ships without runtime dependencies
+- bootstrap can preview the full generated file set before writing into the repository
 
 ## Recommended Repository Name
 
