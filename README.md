@@ -1,6 +1,7 @@
 # Agent Foundry
 
-[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/padjon)
+[![Install on Marketplace](https://img.shields.io/badge/Marketplace-Agent%20Foundry-0078D4?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://marketplace.visualstudio.com/items?itemName=padjon.vscode-agent-foundry)
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/padjon)
 
 `Agent Foundry` is a VS Code extension for the current agentic-software-engineering wave: instead of trying to be yet another coding agent, it turns any repository into an agent-ready workspace.
 
