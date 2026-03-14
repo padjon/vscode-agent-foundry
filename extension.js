@@ -25,6 +25,7 @@ function activate(context) {
     vscode.commands.registerCommand('agentFoundry.generateTaskHandoff', () => generateTaskHandoffCommand(context, state, provider)),
     vscode.commands.registerCommand('agentFoundry.showActions', () => showActionsCommand(context)),
     vscode.commands.registerCommand('agentFoundry.openResearchNotes', () => openResearchNotesCommand(context)),
+    vscode.commands.registerCommand('agentFoundry.openWalkthrough', () => openWalkthroughCommand()),
     vscode.commands.registerCommand(ACTION_OPEN_RESEARCH, () => openResearchNotesCommand(context)),
     vscode.commands.registerCommand(ACTION_ANALYZE, () => analyzeWorkspaceCommand(context, state, provider)),
     vscode.commands.registerCommand(ACTION_BOOTSTRAP, () => bootstrapWorkspaceCommand(context, state, provider)),
@@ -60,6 +61,11 @@ async function showActionsCommand(context) {
         label: 'Open market research',
         description: 'Review the strategy and market validation behind Agent Foundry',
         action: 'research'
+      },
+      {
+        label: 'Open getting started guide',
+        description: 'Open the built-in walkthrough for first-run onboarding',
+        action: 'walkthrough'
       }
     ],
     {
@@ -77,6 +83,8 @@ async function showActionsCommand(context) {
     await vscode.commands.executeCommand('agentFoundry.analyzeWorkspace');
   } else if (pick.action === 'handoff') {
     await vscode.commands.executeCommand('agentFoundry.generateTaskHandoff');
+  } else if (pick.action === 'walkthrough') {
+    await vscode.commands.executeCommand('agentFoundry.openWalkthrough');
   } else {
     await vscode.commands.executeCommand('agentFoundry.openResearchNotes');
   }
@@ -202,6 +210,14 @@ async function openResearchNotesCommand(context) {
   await vscode.window.showTextDocument(doc, { preview: false });
 }
 
+async function openWalkthroughCommand() {
+  await vscode.commands.executeCommand(
+    'workbench.action.openWalkthrough',
+    'padjon.vscode-agent-foundry#agentFoundry.gettingStarted',
+    false
+  );
+}
+
 class FoundryTreeProvider {
   constructor(state) {
     this.state = state;
@@ -223,6 +239,7 @@ class FoundryTreeProvider {
     if (!folder) {
       return [
         createInfoItem('No workspace folder open', 'Open a project to use Agent Foundry.'),
+        createActionItem('Open getting started guide', 'See the core workflow and product entry points', 'agentFoundry.openWalkthrough'),
         createActionItem('Open market research', 'Review the market thesis', ACTION_OPEN_RESEARCH)
       ];
     }
@@ -233,7 +250,8 @@ class FoundryTreeProvider {
         createInfoItem('Workspace ready for analysis', path.basename(folder.fsPath)),
         createActionItem('Analyze workspace', 'Inspect stack, scripts, diagnostics, and current agent assets', ACTION_ANALYZE),
         createActionItem('Bootstrap assets', 'Generate instructions, agents, skills, and reports', ACTION_BOOTSTRAP),
-        createActionItem('Generate task handoff', 'Create a portable context brief for another agent or teammate', ACTION_HANDOFF)
+        createActionItem('Generate task handoff', 'Create a portable context brief for another agent or teammate', ACTION_HANDOFF),
+        createActionItem('Open getting started guide', 'See the recommended first-run flow', 'agentFoundry.openWalkthrough')
       ];
     }
 
@@ -263,6 +281,7 @@ class FoundryTreeProvider {
       createActionItem('Bootstrap assets', 'Write repo files and workspace reports', ACTION_BOOTSTRAP),
       createActionItem('Generate task handoff', 'Create a portable work brief', ACTION_HANDOFF),
       createActionItem('Re-run analysis', 'Refresh the workspace snapshot', ACTION_ANALYZE),
+      createActionItem('Open getting started guide', 'See the recommended first-run flow', 'agentFoundry.openWalkthrough'),
       createActionItem('Open market research', 'Review product positioning and market data', ACTION_OPEN_RESEARCH)
     ];
 

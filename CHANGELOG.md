@@ -11,3 +11,4 @@
 - Added overwrite confirmation before regenerating workflow files
 - Added package-manager-aware verification command suggestions and unit tests
 - Added npm packaging workflow with `vsce --no-dependencies`
+- Added a built-in getting-started walkthrough and marketplace media assets

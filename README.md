@@ -8,6 +8,8 @@ It analyzes the repo, generates portable workflow assets, and creates task hando
 
 If Agent Foundry is useful in your team or open-source workflow, support ongoing development through [GitHub Sponsors](https://github.com/sponsors/padjon).
 
+![Agent Foundry hero](assets/marketplace-hero.png)
+
 ## Why This Direction
 
 The market is moving toward agent-first development, but the setup is fragmented:
@@ -53,6 +55,8 @@ Agent Foundry should win installs by being:
 - creates portable task handoffs under `.agent-foundry/handoffs/`
 - exposes the workflow in a native sidebar instead of hiding it behind one-shot commands
 
+![Agent Foundry screenshot](assets/marketplace-screenshot.png)
+
 ## Commands
 
 - `Agent Foundry: Analyze Workspace`
@@ -60,6 +64,7 @@ Agent Foundry should win installs by being:
 - `Agent Foundry: Generate Task Handoff`
 - `Agent Foundry: Show Actions`
 - `Agent Foundry: Open Market Research`
+- `Agent Foundry: Open Getting Started Guide`
 
 ## Release Readiness
 
@@ -70,6 +75,7 @@ The repository now includes:
 - `npm run verify` for a minimal manifest and syntax check
 - `npm test` for core helper regression coverage
 - `npm run package` for `.vsix` generation
+- built-in walkthrough steps with local media assets
 - `RELEASE_CHECKLIST.md` for packaging and publishing
 
 ## Quality Notes

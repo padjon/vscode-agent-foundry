@@ -1,0 +1,44 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="640" fill="#0B2027"/>
+  <circle cx="1040" cy="120" r="180" fill="#123B44"/>
+  <circle cx="190" cy="580" r="220" fill="#15323A"/>
+  <rect x="56" y="48" width="1168" height="544" rx="28" fill="#102A31" stroke="#2A6975" stroke-width="2"/>
+  <rect x="92" y="94" width="366" height="450" rx="22" fill="#0E2329" stroke="#2A6975" stroke-width="2"/>
+  <rect x="482" y="94" width="320" height="212" rx="22" fill="#0E2329" stroke="#2A6975" stroke-width="2"/>
+  <rect x="826" y="94" width="362" height="212" rx="22" fill="#0E2329" stroke="#2A6975" stroke-width="2"/>
+  <rect x="482" y="332" width="706" height="212" rx="22" fill="#0E2329" stroke="#2A6975" stroke-width="2"/>
+  <text x="94" y="62" fill="#F5E6BE" font-family="DejaVu Sans" font-size="18" font-weight="700">Agent Foundry</text>
+  <text x="112" y="142" fill="#F5E6BE" font-family="DejaVu Sans" font-size="17" font-weight="700">Analyze any repo</text>
+  <text x="112" y="182" fill="#8FD4C1" font-family="DejaVu Sans" font-size="14">Readiness score</text>
+  <rect x="112" y="196" width="308" height="18" rx="9" fill="#17343C"/>
+  <rect x="112" y="196" width="242" height="18" rx="9" fill="#4DB7A7"/>
+  <text x="112" y="246" fill="#EFD7A4" font-family="DejaVu Sans" font-size="14">Stack</text>
+  <text x="112" y="272" fill="#F5E6BE" font-family="DejaVu Sans" font-size="15">TypeScript, React, Node.js</text>
+  <text x="112" y="316" fill="#EFD7A4" font-family="DejaVu Sans" font-size="14">Verification</text>
+  <text x="112" y="342" fill="#F5E6BE" font-family="DejaVu Sans" font-size="15">pnpm lint | pnpm test | pnpm build</text>
+  <text x="112" y="386" fill="#EFD7A4" font-family="DejaVu Sans" font-size="14">Assets</text>
+  <text x="112" y="412" fill="#F5E6BE" font-family="DejaVu Sans" font-size="15">AGENTS.md | prompts | agents | skills</text>
+  <text x="112" y="462" fill="#EFD7A4" font-family="DejaVu Sans" font-size="14">Daily flow</text>
+  <text x="112" y="490" fill="#F5E6BE" font-family="DejaVu Sans" font-size="15">Analyze -> Bootstrap -> Handoff</text>
+  <text x="510" y="140" fill="#F5E6BE" font-family="DejaVu Sans" font-size="18" font-weight="700">Generate repo-native agent assets</text>
+  <rect x="510" y="174" width="110" height="26" rx="13" fill="#4DB7A7"/>
+  <text x="529" y="192" fill="#102A31" font-family="DejaVu Sans" font-size="12" font-weight="700">AGENTS.md</text>
+  <rect x="632" y="174" width="170" height="26" rx="13" fill="#8FD4C1"/>
+  <text x="648" y="192" fill="#102A31" font-family="DejaVu Sans" font-size="12" font-weight="700">copilot-instructions</text>
+  <rect x="510" y="214" width="122" height="26" rx="13" fill="#F5E6BE"/>
+  <text x="541" y="232" fill="#102A31" font-family="DejaVu Sans" font-size="12" font-weight="700">prompts</text>
+  <rect x="646" y="214" width="94" height="26" rx="13" fill="#EFD7A4"/>
+  <text x="672" y="232" fill="#102A31" font-family="DejaVu Sans" font-size="12" font-weight="700">agents</text>
+  <rect x="750" y="214" width="78" height="26" rx="13" fill="#4DB7A7"/>
+  <text x="773" y="232" fill="#102A31" font-family="DejaVu Sans" font-size="12" font-weight="700">skills</text>
+  <text x="854" y="140" fill="#F5E6BE" font-family="DejaVu Sans" font-size="18" font-weight="700">Portable handoffs</text>
+  <text x="854" y="182" fill="#8FD4C1" font-family="DejaVu Sans" font-size="14">Repository context</text>
+  <text x="854" y="212" fill="#8FD4C1" font-family="DejaVu Sans" font-size="14">Git diff snapshot</text>
+  <text x="854" y="242" fill="#8FD4C1" font-family="DejaVu Sans" font-size="14">Diagnostics summary</text>
+  <text x="510" y="372" fill="#F5E6BE" font-family="DejaVu Sans" font-size="26" font-weight="700">Turn any repository into an agent-ready workspace</text>
+  <text x="510" y="416" fill="#8FD4C1" font-family="DejaVu Sans" font-size="18">Cross-agent setup for Copilot, Claude, Codex, Cline, Roo, and more.</text>
+  <rect x="510" y="454" width="220" height="48" rx="24" fill="#4DB7A7"/>
+  <text x="552" y="484" fill="#102A31" font-family="DejaVu Sans" font-size="18" font-weight="700">Bootstrap assets</text>
+  <rect x="748" y="454" width="220" height="48" rx="24" fill="#F5E6BE"/>
+  <text x="793" y="484" fill="#102A31" font-family="DejaVu Sans" font-size="18" font-weight="700">Create handoff</text>
+</svg>

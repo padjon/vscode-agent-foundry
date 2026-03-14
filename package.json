@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "publisher": "padjon",
   "author": "Patrick Schäfer",
+  "icon": "assets/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/padjon/vscode-agent-foundry.git"
@@ -57,6 +58,7 @@
     "onCommand:agentFoundry.generateTaskHandoff",
     "onCommand:agentFoundry.showActions",
     "onCommand:agentFoundry.openResearchNotes",
+    "onCommand:agentFoundry.openWalkthrough",
     "onView:agentFoundry.sidebar"
   ],
   "main": "./extension.js",
@@ -86,6 +88,11 @@
         "command": "agentFoundry.openResearchNotes",
         "title": "Open Market Research",
         "category": "Agent Foundry"
+      },
+      {
+        "command": "agentFoundry.openWalkthrough",
+        "title": "Open Getting Started Guide",
+        "category": "Agent Foundry"
       }
     ],
     "viewsContainers": {
@@ -108,12 +115,12 @@
     "viewsWelcome": [
       {
         "view": "agentFoundry.sidebar",
-        "contents": "Open a folder or workspace to use Agent Foundry.\n[Open market research](command:agentFoundry.openResearchNotes)",
+        "contents": "Open a folder or workspace to use Agent Foundry.\n[Open getting started guide](command:agentFoundry.openWalkthrough)\n[Open market research](command:agentFoundry.openResearchNotes)",
         "when": "!agentFoundry.hasWorkspace"
       },
       {
         "view": "agentFoundry.sidebar",
-        "contents": "Run an analysis, generate portable repo instructions, and create handoffs for Copilot, Claude, Codex, and other coding agents.\n[Analyze workspace](command:agentFoundry.analyzeWorkspace)\n[Bootstrap assets](command:agentFoundry.bootstrapWorkspace)\n[Generate task handoff](command:agentFoundry.generateTaskHandoff)",
+        "contents": "Run an analysis, generate portable repo instructions, and create handoffs for Copilot, Claude, Codex, and other coding agents.\n[Analyze workspace](command:agentFoundry.analyzeWorkspace)\n[Bootstrap assets](command:agentFoundry.bootstrapWorkspace)\n[Generate task handoff](command:agentFoundry.generateTaskHandoff)\n[Open getting started guide](command:agentFoundry.openWalkthrough)",
         "when": "agentFoundry.hasWorkspace"
       }
     ],
@@ -133,9 +140,59 @@
           "command": "agentFoundry.analyzeWorkspace",
           "when": "view == agentFoundry.sidebar",
           "group": "navigation@2"
+        },
+        {
+          "command": "agentFoundry.openWalkthrough",
+          "when": "view == agentFoundry.sidebar",
+          "group": "navigation@3"
         }
       ]
     },
+    "walkthroughs": [
+      {
+        "id": "agentFoundry.gettingStarted",
+        "title": "Get Started With Agent Foundry",
+        "description": "Analyze a repository, bootstrap agent workflow files, and create a portable task handoff.",
+        "steps": [
+          {
+            "id": "agentFoundry.step.analyze",
+            "title": "Analyze the workspace",
+            "description": "Inspect the current repository to detect stack, scripts, diagnostics, git status, and existing agent assets.",
+            "media": {
+              "image": "assets/marketplace-hero.png",
+              "altText": "Agent Foundry hero illustration showing repo analysis and generated workflow assets"
+            },
+            "completionEvents": [
+              "onCommand:agentFoundry.analyzeWorkspace"
+            ]
+          },
+          {
+            "id": "agentFoundry.step.bootstrap",
+            "title": "Bootstrap workflow assets",
+            "description": "Generate AGENTS.md, Copilot instructions, prompts, custom agents, and reusable skills into the repository.",
+            "media": {
+              "image": "assets/marketplace-screenshot.png",
+              "altText": "Agent Foundry walkthrough image showing generated repo assets and sidebar actions"
+            },
+            "completionEvents": [
+              "onCommand:agentFoundry.bootstrapWorkspace"
+            ]
+          },
+          {
+            "id": "agentFoundry.step.handoff",
+            "title": "Create a task handoff",
+            "description": "Capture the current repository state into markdown that can be pasted into another agent session or shared with a teammate.",
+            "media": {
+              "image": "assets/handoff-preview.png",
+              "altText": "Agent Foundry handoff preview showing repository context, diagnostics, and a continuation brief"
+            },
+            "completionEvents": [
+              "onCommand:agentFoundry.generateTaskHandoff"
+            ]
+          }
+        ]
+      }
+    ],
     "configuration": {
       "title": "Agent Foundry",
       "properties": {

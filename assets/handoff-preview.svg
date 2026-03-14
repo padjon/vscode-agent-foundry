@@ -1,0 +1,20 @@
+<svg width="1280" height="800" viewBox="0 0 1280 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="800" fill="#0B2027"/>
+  <rect x="104" y="56" width="1072" height="688" rx="24" fill="#102A31" stroke="#2A6975" stroke-width="2"/>
+  <text x="150" y="118" fill="#F5E6BE" font-family="DejaVu Sans" font-size="28" font-weight="700">Task Handoff</text>
+  <text x="150" y="160" fill="#8FD4C1" font-family="DejaVu Sans" font-size="17">Current task: tighten test coverage around auth middleware</text>
+  <rect x="150" y="196" width="980" height="1" fill="#2A6975"/>
+  <text x="150" y="244" fill="#EFD7A4" font-family="DejaVu Sans" font-size="18" font-weight="700">Current State</text>
+  <text x="150" y="282" fill="#F5E6BE" font-family="DejaVu Sans Mono" font-size="15">- Readiness score: 85/100</text>
+  <text x="150" y="312" fill="#F5E6BE" font-family="DejaVu Sans Mono" font-size="15">- Verification commands: pnpm lint, pnpm test</text>
+  <text x="150" y="342" fill="#F5E6BE" font-family="DejaVu Sans Mono" font-size="15">- Diagnostics: 0 errors, 2 warnings</text>
+  <text x="150" y="396" fill="#EFD7A4" font-family="DejaVu Sans" font-size="18" font-weight="700">Relevant Files</text>
+  <text x="150" y="434" fill="#F5E6BE" font-family="DejaVu Sans Mono" font-size="15">- src/auth/middleware.ts</text>
+  <text x="150" y="464" fill="#F5E6BE" font-family="DejaVu Sans Mono" font-size="15">- test/auth/middleware.test.ts</text>
+  <text x="150" y="518" fill="#EFD7A4" font-family="DejaVu Sans" font-size="18" font-weight="700">Paste-Ready Brief</text>
+  <rect x="150" y="544" width="980" height="150" rx="16" fill="#0A1E23"/>
+  <text x="180" y="586" fill="#8FD4C1" font-family="DejaVu Sans Mono" font-size="14">You are continuing the task in repository "my-app".</text>
+  <text x="180" y="614" fill="#8FD4C1" font-family="DejaVu Sans Mono" font-size="14">Use pnpm lint and pnpm test when relevant.</text>
+  <text x="180" y="642" fill="#8FD4C1" font-family="DejaVu Sans Mono" font-size="14">Start with src/auth/middleware.ts and test/auth/middleware.test.ts.</text>
+  <text x="180" y="670" fill="#8FD4C1" font-family="DejaVu Sans Mono" font-size="14">Produce a short plan first, then implement the smallest safe change.</text>
+</svg>
