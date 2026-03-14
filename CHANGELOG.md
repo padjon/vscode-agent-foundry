@@ -13,3 +13,4 @@
 - Added npm packaging workflow with `vsce --no-dependencies`
 - Added a built-in getting-started walkthrough and marketplace media assets
 - Added preview-before-write flow for generated workflow assets
+- Added stack-aware instruction generation for Next.js, Python, and monorepo repositories

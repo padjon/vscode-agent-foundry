@@ -329,7 +329,8 @@ async function analyzeWorkspace(folder) {
   };
 
   const has = (relativePath) => fs.existsSync(path.join(rootPath, relativePath));
-  const techStack = detectTechStack(rootPath, packageJson, allDependencies);
+  const projectFacts = detectProjectFacts(rootPath, packageJson);
+  const techStack = detectTechStack(rootPath, packageJson, allDependencies, projectFacts);
   const packageManager = detectPackageManager(rootPath);
   const verificationCommands = detectVerificationCommands(packageScripts, packageManager);
   const diagnostics = collectDiagnostics(rootPath);
@@ -348,17 +349,12 @@ async function analyzeWorkspace(folder) {
     existingAssets,
     git,
     recommendedActions,
-    projectFacts: {
-      hasPackageJson: Boolean(packageJson),
-      hasDocker: has('Dockerfile') || has('docker-compose.yml') || has('compose.yml'),
-      hasEnvExample: has('.env.example') || has('.env.sample'),
-      hasReadme: has('README.md')
-    },
+    projectFacts,
     readinessScore: computeReadinessScore(existingAssets, verificationCommands, diagnostics, git)
   };
 }
 
-function detectTechStack(rootPath, packageJson, dependencies) {
+function detectTechStack(rootPath, packageJson, dependencies, projectFacts) {
   const stack = [];
   const add = (label) => {
     if (!stack.includes(label)) {
@@ -408,6 +404,9 @@ function detectTechStack(rootPath, packageJson, dependencies) {
   if (dependencies.prisma) {
     add('Prisma');
   }
+  if (fs.existsSync(path.join(rootPath, 'turbo.json'))) {
+    add('Turborepo');
+  }
   if (fs.existsSync(path.join(rootPath, 'pyproject.toml')) || fs.existsSync(path.join(rootPath, 'requirements.txt'))) {
     add('Python');
   }
@@ -426,12 +425,54 @@ function detectTechStack(rootPath, packageJson, dependencies) {
   if (fs.existsSync(path.join(rootPath, 'Dockerfile')) || fs.existsSync(path.join(rootPath, 'docker-compose.yml'))) {
     add('Docker');
   }
+  if (projectFacts && projectFacts.isMonorepo) {
+    add('Monorepo');
+  }
 
   if (!stack.length) {
     add('Generic repository');
   }
 
   return stack;
+}
+
+function detectProjectFacts(rootPath, packageJson) {
+  const packageJsonWorkspaces = packageJson && Array.isArray(packageJson.workspaces)
+    ? packageJson.workspaces
+    : packageJson && packageJson.workspaces && Array.isArray(packageJson.workspaces.packages)
+      ? packageJson.workspaces.packages
+      : [];
+  const hasDirectory = (relativePath) => {
+    try {
+      return fs.statSync(path.join(rootPath, relativePath)).isDirectory();
+    } catch (_error) {
+      return false;
+    }
+  };
+
+  return {
+    hasPackageJson: Boolean(packageJson),
+    hasDocker: fs.existsSync(path.join(rootPath, 'Dockerfile')) || fs.existsSync(path.join(rootPath, 'docker-compose.yml')) || fs.existsSync(path.join(rootPath, 'compose.yml')),
+    hasEnvExample: fs.existsSync(path.join(rootPath, '.env.example')) || fs.existsSync(path.join(rootPath, '.env.sample')),
+    hasReadme: fs.existsSync(path.join(rootPath, 'README.md')),
+    hasPyproject: fs.existsSync(path.join(rootPath, 'pyproject.toml')),
+    hasRequirementsTxt: fs.existsSync(path.join(rootPath, 'requirements.txt')),
+    hasTurboConfig: fs.existsSync(path.join(rootPath, 'turbo.json')),
+    hasPnpmWorkspace: fs.existsSync(path.join(rootPath, 'pnpm-workspace.yaml')),
+    hasAppDirectory: hasDirectory('app'),
+    hasPagesDirectory: hasDirectory('pages'),
+    hasSrcDirectory: hasDirectory('src'),
+    hasAppsDirectory: hasDirectory('apps'),
+    hasPackagesDirectory: hasDirectory('packages'),
+    hasServicesDirectory: hasDirectory('services'),
+    hasTestsDirectory: hasDirectory('test') || hasDirectory('tests'),
+    workspaceGlobs: packageJsonWorkspaces,
+    isMonorepo:
+      Boolean(packageJsonWorkspaces.length) ||
+      fs.existsSync(path.join(rootPath, 'pnpm-workspace.yaml')) ||
+      fs.existsSync(path.join(rootPath, 'turbo.json')) ||
+      (hasDirectory('apps') && hasDirectory('packages'))
+  };
 }
 
 function detectPackageManager(rootPath) {
@@ -735,6 +776,16 @@ function buildGeneratedFiles(folder, analysis) {
     { relativePath: `${outputFolder}/implementation-plan.md`, content: buildImplementationPlan(analysis) }
   ];
 
+  if (analysis.techStack.includes('Next.js')) {
+    files.push({ relativePath: '.github/instructions/nextjs.instructions.md', content: buildInstructionFile('nextjs', analysis) });
+  }
+  if (analysis.techStack.includes('Python')) {
+    files.push({ relativePath: '.github/instructions/python.instructions.md', content: buildInstructionFile('python', analysis) });
+  }
+  if (analysis.projectFacts && analysis.projectFacts.isMonorepo) {
+    files.push({ relativePath: '.github/instructions/monorepo.instructions.md', content: buildInstructionFile('monorepo', analysis) });
+  }
+
   if (includeClaudeAssets) {
     files.push({ relativePath: 'CLAUDE.md', content: buildClaudeMd(analysis) });
     files.push({ relativePath: '.claude/agents/planner.md', content: buildClaudeAgent('planner', analysis) });
@@ -984,6 +1035,59 @@ function buildCopilotInstructions(analysis) {
 }
 
 function buildInstructionFile(kind, analysis) {
+  if (kind === 'nextjs') {
+    return [
+      '---',
+      'applyTo: "{app,pages,src/app,src/pages}/**/*.{ts,tsx,js,jsx}"',
+      '---',
+      '',
+      '# Next.js Instructions',
+      '',
+      analysis.projectFacts.hasAppDirectory
+        ? '- Respect the App Router boundaries: keep server components server-first and use client components only where interactivity is required.'
+        : '- Preserve the current routing structure and avoid mixing incompatible Next.js router patterns without a clear migration plan.',
+      '- Keep data fetching and cache invalidation choices explicit.',
+      '- Prefer framework-native APIs before adding extra abstraction layers.',
+      '- Call out any change that affects rendering mode, caching, or server/client boundaries.',
+      ''
+    ].join('\n');
+  }
+
+  if (kind === 'python') {
+    return [
+      '---',
+      'applyTo: "**/*.py"',
+      '---',
+      '',
+      '# Python Instructions',
+      '',
+      '- Keep modules explicit and import paths straightforward.',
+      '- Prefer small functions with obvious inputs and outputs over magic-heavy abstractions.',
+      '- Keep dependency changes minimal and mention them clearly in the final handoff.',
+      '- If the repository exposes tests or linting, use them as part of the verification path before closing the task.',
+      ''
+    ].join('\n');
+  }
+
+  if (kind === 'monorepo') {
+    return [
+      '---',
+      'applyTo: "{apps,packages,services}/**/*"',
+      '---',
+      '',
+      '# Monorepo Instructions',
+      '',
+      '- Keep the blast radius explicit: list which package or app owns the change.',
+      '- Prefer package-local fixes before introducing repo-wide abstractions.',
+      '- Name cross-package contracts when changing shared types, APIs, or build configuration.',
+      '- Run the narrowest verification commands that still prove the affected workspace is healthy.',
+      analysis.projectFacts.workspaceGlobs.length
+        ? `- Workspace globs detected: ${analysis.projectFacts.workspaceGlobs.join(', ')}.`
+        : '- Workspace manifests were detected; keep package boundaries obvious in the final handoff.',
+      ''
+    ].join('\n');
+  }
+
   if (kind === 'frontend') {
     return [
       '---',
@@ -1027,6 +1131,9 @@ function buildInstructionFile(kind, analysis) {
     '',
     '- Read `AGENTS.md` and `.github/copilot-instructions.md` before changing repository-wide patterns.',
     `- Default verification path: ${analysis.verificationCommands.join(', ') || 'document missing verification before merging large changes'}.`,
+    analysis.projectFacts && analysis.projectFacts.isMonorepo
+      ? '- This repository is structured as a monorepo; keep ownership and affected packages explicit.'
+      : '- Keep ownership obvious when changes span multiple directories or layers.',
     '- Keep changes reviewable and mention skipped checks explicitly.',
     ''
   ].join('\n');
@@ -1049,6 +1156,9 @@ function buildPromptFile(kind, analysis) {
       '',
       '- Start with a brief implementation plan.',
       `- Use these verification commands when relevant: ${analysis.verificationCommands.join(', ') || 'identify the right verification commands first'}.`,
+      analysis.projectFacts && analysis.projectFacts.isMonorepo
+        ? '- State which app, package, or service owns the change before editing.'
+        : '- State the primary files or subsystem before editing.',
       '- Keep unrelated user changes intact.',
       '- End with a short summary, commands run, and residual risks.',
       ''
@@ -1070,6 +1180,9 @@ function buildPromptFile(kind, analysis) {
     '',
     '- the problem statement',
     '- affected files and why they matter',
+    analysis.projectFacts && analysis.projectFacts.isMonorepo
+      ? '- affected apps, packages, or services and any shared contracts they depend on'
+      : '- the main subsystem or feature area impacted by the task',
     '- the smallest viable implementation path',
     `- relevant verification commands: ${analysis.verificationCommands.join(', ') || 'identify them from the repo first'}`,
     '- rollout risks and open questions',
@@ -1294,11 +1407,17 @@ function buildRepoSpecificExpectations(analysis) {
   if (analysis.techStack.includes('TypeScript')) {
     items.push('Preserve or improve type safety when changing interfaces and data flow.');
   }
+  if (analysis.techStack.includes('Next.js')) {
+    items.push('Protect rendering boundaries, routing behavior, and cache semantics when changing Next.js code.');
+  }
   if (analysis.techStack.includes('React') || analysis.techStack.includes('Next.js')) {
     items.push('Keep component changes localized and avoid broad UI rewrites unless the task requires them.');
   }
   if (analysis.techStack.includes('Python')) {
     items.push('Prefer straightforward modules and keep runtime dependencies explicit.');
+  }
+  if (analysis.projectFacts && analysis.projectFacts.isMonorepo) {
+    items.push('Name the affected app, package, or service and avoid unnecessary cross-workspace churn.');
   }
   if (analysis.verificationCommands.length) {
     items.push(`Use ${analysis.verificationCommands.join(', ')} as the default verification spine.`);
@@ -1441,6 +1560,8 @@ module.exports = {
     getScriptRunner,
     formatScriptCommand,
     detectPackageManager,
+    detectProjectFacts,
+    detectTechStack,
     slugify,
     formatDateStamp,
     computeReadinessScore

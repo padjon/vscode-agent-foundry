@@ -82,6 +82,49 @@ test('detectPackageManager respects lockfile priority', () => {
   }
 });
 
+test('detectProjectFacts recognizes monorepo indicators', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-foundry-project-facts-'));
+
+  try {
+    fs.mkdirSync(path.join(tempRoot, 'apps'));
+    fs.mkdirSync(path.join(tempRoot, 'packages'));
+    fs.writeFileSync(path.join(tempRoot, 'pnpm-workspace.yaml'), 'packages:\n  - apps/*\n  - packages/*\n');
+
+    const facts = __testUtils.detectProjectFacts(tempRoot, {
+      workspaces: ['apps/*', 'packages/*']
+    });
+
+    assert.equal(facts.isMonorepo, true);
+    assert.equal(facts.hasAppsDirectory, true);
+    assert.equal(facts.hasPackagesDirectory, true);
+    assert.deepEqual(facts.workspaceGlobs, ['apps/*', 'packages/*']);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
+test('detectTechStack includes monorepo and turborepo labels when detected', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'agent-foundry-tech-stack-'));
+
+  try {
+    fs.writeFileSync(path.join(tempRoot, 'turbo.json'), '{}');
+    const stack = __testUtils.detectTechStack(
+      tempRoot,
+      { workspaces: ['apps/*'] },
+      { next: '^15.0.0', react: '^19.0.0' },
+      {
+        isMonorepo: true
+      }
+    );
+
+    assert.equal(stack.includes('Next.js'), true);
+    assert.equal(stack.includes('Turborepo'), true);
+    assert.equal(stack.includes('Monorepo'), true);
+  } finally {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  }
+});
+
 test('slugify creates stable handoff-friendly slugs', () => {
   assert.equal(__testUtils.slugify('Tighten test coverage around auth middleware'), 'tighten-test-coverage-around-auth-middleware');
   assert.equal(__testUtils.slugify('  Weird__Spacing!!  '), 'weird-spacing');

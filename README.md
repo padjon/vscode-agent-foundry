@@ -35,7 +35,7 @@ Agent Foundry should win installs by being:
 ## What The Extension Does Today
 
 - analyzes the current workspace and scores agent readiness
-- detects the stack, scripts, diagnostics, and current git status
+- detects the stack, project shape, scripts, diagnostics, and current git status
 - generates:
   - `AGENTS.md`
   - `CLAUDE.md`
@@ -43,6 +43,7 @@ Agent Foundry should win installs by being:
   - `.github/instructions/repository.instructions.md`
   - `.github/instructions/frontend.instructions.md`
   - `.github/instructions/backend.instructions.md`
+  - stack-aware files such as `.github/instructions/nextjs.instructions.md`, `.github/instructions/python.instructions.md`, and `.github/instructions/monorepo.instructions.md` when relevant
   - `.github/prompts/plan-change.prompt.md`
   - `.github/prompts/ship-change.prompt.md`
   - `.github/agents/planner.agent.md`
@@ -86,6 +87,7 @@ The repository now includes:
 - core helper logic has a lightweight built-in test suite
 - packaging uses `vsce --no-dependencies` because the extension ships without runtime dependencies
 - bootstrap can preview the full generated file set before writing into the repository
+- generated instruction files now adapt to common repo shapes such as Next.js apps, Python services, and monorepos
 
 ## Recommended Repository Name
 
